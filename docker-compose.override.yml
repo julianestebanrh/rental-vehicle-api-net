@@ -1,0 +1,48 @@
+version: '3.4'
+
+services:
+
+  vehiclerental-db:
+    container_name: vehicle_rental-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres 
+      - POSTGRES_DB=vehicle_rental
+    restart: always
+    volumes:
+      - ./.containers/database:/var/lib/postgresql/data
+    ports:
+      - 5432:5432 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  vehiclerental-api:
+    container_name: vehicle_rental_api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      # - ASPNETCORE_URLS=http://+:8080 
+      # - ASPNETCORE_HTTP_PORTS=8080
+      # - ASPNETCORE_HTTPS_PORTS=8081
+      # - ConnectionStrings__Database=Host=vehiclerental-db;Port=5432;Database=vehicle_rental;Username=postgres;Password=postgres
+    ports:
+      - 5000:8080
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+    depends_on:
+      vehiclerental-db:
+        condition: service_healthy
+
+
+  vehiclerental-seq:
+    container_name: vehicle_rental_seq
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - 5341:5341
+      - 8081:80
+ 
+

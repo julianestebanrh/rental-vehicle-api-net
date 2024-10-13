@@ -1,0 +1,16 @@
+version: '3.4'
+
+services:
+
+  vehiclerental-db:
+    image: postgres:16.0
+
+  vehiclerental-api:
+    image: ${DOCKER_REGISTRY-}vehiclerentalapi
+    build:
+      context: .
+      dockerfile: src/VehicleRental.Api/Dockerfile
+
+  vehiclerental-seq:
+    image: datalust/seq:latest
+
